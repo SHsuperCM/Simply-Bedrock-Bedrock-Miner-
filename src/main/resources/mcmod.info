@@ -1,0 +1,11 @@
+[
+{
+  "modid": "simplybedrock",
+  "name": "Simply Bedrock",
+  "description": "Simply Bedrock is a mod aimed to make players regain control over bedrock",
+  "version": "1.0.0",
+  "mcversion": "1.12",
+  "url": "",
+  "authorList": ["SHsuperCM"]
+}
+]
