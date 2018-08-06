@@ -13,4 +13,7 @@ public class Config {
         ConfigManager.sync(SimplyBedrock.MODID, net.minecraftforge.common.config.Config.Type.INSTANCE);
     }
 
+    @net.minecraftforge.common.config.Config.Name("Bedrock Hitpoints")
+    @net.minecraftforge.common.config.Config.Comment({"Determines how many hits bedrock requires by a Bedrock Miner to be broken.","Controls the both the time and fuel it takes in ticks(20th of a second)"})
+    public static int bedrock_hitpoints = 6000;
 }

@@ -10,7 +10,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.tileentity.TileEntityLockable;
 import net.minecraft.util.ITickable;
@@ -21,6 +20,7 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
 
     public ItemStack fuelItem = ItemStack.EMPTY;
     public int fuelAmount = 0;
+    public int fuelBurnTime = 0;
     public int progress = 0;
 
     @Override
@@ -28,6 +28,7 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
         super.readFromNBT(compound);
         fuelItem = new ItemStack(compound.getCompoundTag("FuelItem"));
         fuelAmount = compound.getInteger("FuelAmount");
+        fuelBurnTime = compound.getInteger("FuelBurnTime");
         progress = compound.getInteger("Progress");
     }
 
@@ -37,6 +38,7 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
         fuelItem.writeToNBT(nbtFuelItem);
         compound.setTag("FuelItem",nbtFuelItem);
         compound.setInteger("FuelAmount", fuelAmount);
+        compound.setInteger("FuelBurnTime", fuelBurnTime);
         compound.setInteger("Progress", progress);
         return super.writeToNBT(compound);
     }
@@ -50,6 +52,7 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
     @Override
     public void handleUpdateTag(NBTTagCompound tag) {
         super.handleUpdateTag(tag);
+        fuelItem = new ItemStack(tag.getCompoundTag("FuelItem"));
         fuelAmount = tag.getInteger("FuelAmount");
         progress = tag.getInteger("Progress");
     }
@@ -62,6 +65,9 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
     @Override
     public NBTTagCompound getUpdateTag() {
         NBTTagCompound compound = super.getUpdateTag();
+        NBTTagCompound nbtFuelItem = new NBTTagCompound();
+        fuelItem.writeToNBT(nbtFuelItem);
+        compound.setTag("FuelItem",nbtFuelItem);
         compound.setInteger("FuelAmount", fuelAmount);
         compound.setInteger("Progress", progress);
         return compound;
@@ -78,10 +84,11 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
                     progress++;
                     fuelAmount--;
                 } else {
-                    int fuel = TileEntityFurnace.getItemBurnTime(fuelItem);
-                    if(fuel > 0) {
+                    int fuel;
+                    if((fuel = TileEntityFurnace.getItemBurnTime(fuelItem)) > 0) {
                         fuelAmount += fuel;
-                        decrStackSize(0,-1);
+                        fuelItem.setCount(fuelItem.getCount()-1);
+                        fuelBurnTime = fuelAmount;
                     }
                 }
             } else
@@ -115,8 +122,7 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
 
     @Override
     public ItemStack decrStackSize(int index, int count) {
-        fuelItem.setCount(count < 0 ? fuelItem.getCount() + count : count);
-        return fuelItem;
+        return fuelItem.splitStack(count);
     }
 
     @Override
@@ -128,7 +134,11 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
 
     @Override
     public void setInventorySlotContents(int index, ItemStack stack) {
-        fuelItem = stack;
+        if(fuelItem.isEmpty())
+            fuelItem = stack;
+        else if(stack.isItemEqual(fuelItem) && ItemStack.areItemStackTagsEqual(stack,fuelItem)) {
+            fuelItem.setCount(fuelItem.getCount() + stack.getCount());
+        }
     }
 
     @Override
@@ -143,7 +153,6 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
 
     @Override
     public void openInventory(EntityPlayer player) {}
-
     @Override
     public void closeInventory(EntityPlayer player) {}
 
