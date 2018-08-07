@@ -14,7 +14,7 @@ public class TESRBlockMiner extends TileEntitySpecialRenderer<TEBlockMiner> {
 
     @Override
     public void render(TEBlockMiner te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        super.render(te, x, y, z, partialTicks, destroyStage, alpha);
+        //super.render(te, x, y, z, partialTicks, destroyStage, alpha);
         if(te.fuelAmount > 0 && getWorld().getBlockState(te.getPos().down()).getBlock() == Blocks.BEDROCK)
             angle += 5;
 

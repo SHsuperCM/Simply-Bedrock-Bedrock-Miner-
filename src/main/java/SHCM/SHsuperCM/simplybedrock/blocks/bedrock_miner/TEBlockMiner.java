@@ -1,6 +1,8 @@
 package SHCM.SHsuperCM.simplybedrock.blocks.bedrock_miner;
 
 import SHCM.SHsuperCM.simplybedrock.SimplyBedrock;
+import SHCM.SHsuperCM.simplybedrock.blocks.ModBlocks;
+import com.sun.org.apache.xml.internal.security.utils.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
@@ -79,6 +81,7 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
             if(progress >= 6000) {
                 world.setBlockState(pos.down(),Blocks.AIR.getDefaultState());
                 progress = 0;
+                sync();
             } else if (world.getBlockState(getPos().down()).getBlock() == Blocks.BEDROCK) {
                 if (fuelAmount > 0) {
                     progress++;
@@ -91,10 +94,12 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
                         fuelBurnTime = fuelAmount;
                     }
                 }
-            } else
-                progress = 0;
 
-            sync();
+                sync();
+            } else if (progress != 0) {
+                progress = 0;
+                sync();
+            }
         }
     }
 
@@ -134,11 +139,7 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
 
     @Override
     public void setInventorySlotContents(int index, ItemStack stack) {
-        if(fuelItem.isEmpty())
-            fuelItem = stack;
-        else if(stack.isItemEqual(fuelItem) && ItemStack.areItemStackTagsEqual(stack,fuelItem)) {
-            fuelItem.setCount(fuelItem.getCount() + stack.getCount());
-        }
+        fuelItem = stack;
     }
 
     @Override
@@ -162,12 +163,21 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
     }
 
     @Override
-    public int getField(int id) {return 0;}
+    public int getField(int id) {
+        if (id == 0)
+            return fuelBurnTime;
+        return 0;
+    }
     @Override
-    public void setField(int id, int value) {}
+    public void setField(int id, int value) {
+        switch (id) {
+            case 0:
+                fuelBurnTime = value;
+        }
+    }
     @Override
     public int getFieldCount() {
-        return 0;
+        return 1;
     }
 
     @Override
@@ -175,7 +185,7 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
 
     @Override
     public String getName() {
-        return "Bedrock Miner";
+        return "tile.simplybedrock:bedrock_miner.name";
     }
 
     @Override
@@ -191,5 +201,21 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
     @Override
     public String getGuiID() {
         return SimplyBedrock.MODID + ":bedrock_miner_container";
+    }
+
+    public ItemStack getItem() {
+        ItemStack item = new ItemStack(ModBlocks.bedrock_miner,1);
+        if(fuelAmount > 0 || !fuelItem.isEmpty()) {
+            NBTTagCompound teInfo = new NBTTagCompound();
+
+            NBTTagCompound nbtFuelItem = new NBTTagCompound();
+            fuelItem.writeToNBT(nbtFuelItem);
+            teInfo.setTag("FuelItem", nbtFuelItem);
+            teInfo.setInteger("FuelAmount", fuelAmount);
+            teInfo.setInteger("FuelBurnTime", fuelBurnTime);
+
+            item.setTagInfo("BlockEntityTag", teInfo);
+        }
+        return item;
     }
 }

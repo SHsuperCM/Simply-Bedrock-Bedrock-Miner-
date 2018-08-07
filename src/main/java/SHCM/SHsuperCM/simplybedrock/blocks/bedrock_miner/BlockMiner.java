@@ -8,24 +8,25 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
 public class BlockMiner extends BlockContainer implements ITileEntityProvider {
     public BlockMiner() {
-        super(Material.WOOD, MapColor.WOOD);
+        super(Material.ROCK, MapColor.QUARTZ);
         setHardness(0.75F);
         setCreativeTab(CreativeTabs.DECORATIONS);
+        this.fullBlock = false;
     }
 
     @Override
-    public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
+    public boolean isOpaqueCube(IBlockState state) {
         return false;
     }
 
@@ -48,9 +49,14 @@ public class BlockMiner extends BlockContainer implements ITileEntityProvider {
 
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if(!worldIn.isRemote)
-            playerIn.openGui(SimplyBedrock.instance,0,worldIn,pos.getX(),pos.getY(),pos.getZ());
+        if (!worldIn.isRemote)
+            playerIn.openGui(SimplyBedrock.instance, 0, worldIn, pos.getX(), pos.getY(), pos.getZ());
 
         return true;
+    }
+
+    @Override
+    public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack stack) {
+        spawnAsEntity(worldIn,pos,((TEBlockMiner)te).getItem());
     }
 }

@@ -36,6 +36,23 @@ public class ContainerBlockMiner extends Container {
     public void addListener(IContainerListener listener) {
         super.addListener(listener);
         listener.sendAllWindowProperties(this,te);
+        listener.sendSlotContents(this,36,te.fuelItem);
+        //TODO sort out slot issues
+    }
+
+    @Override
+    public void detectAndSendChanges() {
+        super.detectAndSendChanges();
+        for (int i = 0; i < this.listeners.size(); ++i) {
+            IContainerListener icontainerlistener = this.listeners.get(i);
+
+            icontainerlistener.sendWindowProperty(this,0,te.fuelBurnTime);
+        }
+    }
+
+    @Override
+    public void updateProgressBar(int id, int data) {
+        te.setField(id,data);
     }
 
     @Override // From MBE https://github.com/TheGreyGhost/MinecraftByExample/blob/master/src/main/java/minecraftbyexample/mbe30_inventory_basic/ContainerBasic.java
