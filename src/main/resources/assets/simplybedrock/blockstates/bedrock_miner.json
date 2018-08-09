@@ -1,0 +1,7 @@
+{
+    "variants": {
+        "normal": [
+            { "model": "simplybedrock:bedrock_miner" }
+        ]
+    }
+}

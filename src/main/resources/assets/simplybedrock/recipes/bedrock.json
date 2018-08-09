@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BB",
+    "BB"
+  ],
+  "key": {
+    "B": {
+      "item": "simplybedrock:bedrock_dust"
+    }
+  },
+  "result": {
+    "item": "minecraft:bedrock",
+    "data": 0
+  }
+}
