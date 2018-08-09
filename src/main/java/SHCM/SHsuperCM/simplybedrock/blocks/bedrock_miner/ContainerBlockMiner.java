@@ -37,7 +37,6 @@ public class ContainerBlockMiner extends Container {
         super.addListener(listener);
         listener.sendAllWindowProperties(this,te);
         listener.sendSlotContents(this,36,te.fuelItem);
-        //TODO sort out slot issues
     }
 
     @Override
@@ -47,6 +46,8 @@ public class ContainerBlockMiner extends Container {
             IContainerListener icontainerlistener = this.listeners.get(i);
 
             icontainerlistener.sendWindowProperty(this,0,te.fuelBurnTime);
+
+            icontainerlistener.sendSlotContents(this,36,te.fuelItem);
         }
     }
 
@@ -55,7 +56,7 @@ public class ContainerBlockMiner extends Container {
         te.setField(id,data);
     }
 
-    @Override // From MBE https://github.com/TheGreyGhost/MinecraftByExample/blob/master/src/main/java/minecraftbyexample/mbe30_inventory_basic/ContainerBasic.java
+    @Override
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int sourceSlotIndex) {
         Slot sourceSlot = inventorySlots.get(sourceSlotIndex);
         if (sourceSlot == null || !sourceSlot.getHasStack()) return ItemStack.EMPTY;

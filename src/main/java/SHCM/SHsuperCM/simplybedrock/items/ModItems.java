@@ -1,6 +1,5 @@
 package SHCM.SHsuperCM.simplybedrock.items;
 
-import SHCM.SHsuperCM.simplybedrock.SimplyBedrock;
 import SHCM.SHsuperCM.simplybedrock.blocks.ModBlocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;

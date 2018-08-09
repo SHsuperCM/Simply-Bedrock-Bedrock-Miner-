@@ -2,21 +2,31 @@ package SHCM.SHsuperCM.simplybedrock.blocks.bedrock_miner;
 
 import SHCM.SHsuperCM.simplybedrock.SimplyBedrock;
 import SHCM.SHsuperCM.simplybedrock.blocks.ModBlocks;
+import SHCM.SHsuperCM.simplybedrock.items.ModItems;
 import com.sun.org.apache.xml.internal.security.utils.I18n;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketCustomSound;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.tileentity.TileEntityLockable;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.SoundCategory;
 
 import javax.annotation.Nullable;
+
+import static net.minecraft.block.BlockObserver.POWERED;
 
 public class TEBlockMiner extends TileEntityLockable implements ITickable, IInventory {
 
@@ -54,7 +64,6 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
     @Override
     public void handleUpdateTag(NBTTagCompound tag) {
         super.handleUpdateTag(tag);
-        fuelItem = new ItemStack(tag.getCompoundTag("FuelItem"));
         fuelAmount = tag.getInteger("FuelAmount");
         progress = tag.getInteger("Progress");
     }
@@ -67,9 +76,6 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
     @Override
     public NBTTagCompound getUpdateTag() {
         NBTTagCompound compound = super.getUpdateTag();
-        NBTTagCompound nbtFuelItem = new NBTTagCompound();
-        fuelItem.writeToNBT(nbtFuelItem);
-        compound.setTag("FuelItem",nbtFuelItem);
         compound.setInteger("FuelAmount", fuelAmount);
         compound.setInteger("Progress", progress);
         return compound;
@@ -78,10 +84,13 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
     @Override
     public void update() {
         if(!world.isRemote) {
-            if(progress >= 6000) {
-                world.setBlockState(pos.down(),Blocks.AIR.getDefaultState());
+            if(progress >= SimplyBedrock.Config.bedrock_hitpoints) {
+                world.destroyBlock(pos.down(),false);
                 progress = 0;
-                sync();
+                world.getPlayers(EntityPlayerMP.class,input -> input.getDistance(pos.getX(),pos.getY(),pos.getZ()) < 10).forEach(player -> player.connection.sendPacket(new SPacketCustomSound("minecraft:block.stone.break", SoundCategory.BLOCKS,pos.getX(),pos.getY(),pos.getZ(),1f,0.5f)));
+                world.spawnEntity(new EntityItem(world,getPos().getX() + 0.5d, pos.getY() + 0.7d, pos.getZ() + 0.5d,new ItemStack(ModItems.bedrock_dust)));
+
+                world.notifyNeighborsOfStateChange(pos, ModBlocks.bedrock_miner, true);
             } else if (world.getBlockState(getPos().down()).getBlock() == Blocks.BEDROCK) {
                 if (fuelAmount > 0) {
                     progress++;
@@ -90,24 +99,25 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
                     int fuel;
                     if((fuel = TileEntityFurnace.getItemBurnTime(fuelItem)) > 0) {
                         fuelAmount += fuel;
-                        fuelItem.setCount(fuelItem.getCount()-1);
+
+                        if(fuelItem.getItem() == Items.LAVA_BUCKET)
+                            fuelItem = new ItemStack(Items.BUCKET);
+                        else
+                            fuelItem.setCount(fuelItem.getCount()-1);
+
                         fuelBurnTime = fuelAmount;
                     }
                 }
-
-                sync();
-            } else if (progress != 0) {
+            } else if (progress != 0)
                 progress = 0;
-                sync();
-            }
-        }
-    }
+            else
+                return;
 
-    private void sync() {
-        world.markBlockRangeForRenderUpdate(pos, pos);
-        world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
-        world.scheduleBlockUpdate(pos,this.getBlockType(),0,0);
-        markDirty();
+            world.markBlockRangeForRenderUpdate(pos, pos);
+            world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
+            world.scheduleBlockUpdate(pos,this.getBlockType(),0,0);
+            markDirty();
+        }
     }
 
     @Override
@@ -127,19 +137,23 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
 
     @Override
     public ItemStack decrStackSize(int index, int count) {
-        return fuelItem.splitStack(count);
+        ItemStack item = fuelItem.splitStack(count);
+        markDirty();
+        return item;
     }
 
     @Override
     public ItemStack removeStackFromSlot(int index) {
         ItemStack item = fuelItem;
         fuelItem = ItemStack.EMPTY;
+        markDirty();
         return item;
     }
 
     @Override
     public void setInventorySlotContents(int index, ItemStack stack) {
         fuelItem = stack;
+        markDirty();
     }
 
     @Override
@@ -181,11 +195,14 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
     }
 
     @Override
-    public void clear() {fuelItem = ItemStack.EMPTY;}
+    public void clear() {
+        fuelItem = ItemStack.EMPTY;
+        markDirty();
+    }
 
     @Override
     public String getName() {
-        return "tile.simplybedrock:bedrock_miner.name";
+        return "tile." + SimplyBedrock.MODID + ":bedrock_miner.name";
     }
 
     @Override

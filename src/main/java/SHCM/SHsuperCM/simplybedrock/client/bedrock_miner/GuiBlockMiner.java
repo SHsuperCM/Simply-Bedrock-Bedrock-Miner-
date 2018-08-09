@@ -1,6 +1,5 @@
 package SHCM.SHsuperCM.simplybedrock.client.bedrock_miner;
 
-import SHCM.SHsuperCM.simplybedrock.Config;
 import SHCM.SHsuperCM.simplybedrock.SimplyBedrock;
 import SHCM.SHsuperCM.simplybedrock.blocks.bedrock_miner.ContainerBlockMiner;
 import SHCM.SHsuperCM.simplybedrock.blocks.bedrock_miner.TEBlockMiner;
@@ -41,8 +40,8 @@ public class GuiBlockMiner extends GuiContainer{
         mc.getTextureManager().bindTexture(TEXTURE);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-        if(Config.bedrock_hitpoints != 0 && tileEntity.getWorld().getBlockState(tileEntity.getPos().down()).getBlock() == Blocks.BEDROCK) {
-            int p = tileEntity.progress * 128 / Config.bedrock_hitpoints;
+        if(SimplyBedrock.Config.bedrock_hitpoints != 0 && tileEntity.getWorld().getBlockState(tileEntity.getPos().down()).getBlock() == Blocks.BEDROCK) {
+            int p = tileEntity.progress * 128 / SimplyBedrock.Config.bedrock_hitpoints;
             drawTexturedModalRect(41 + p, 21, 41, 133, 128 - p, 16);
         }
         if(tileEntity.fuelBurnTime != 0) {
@@ -50,13 +49,15 @@ public class GuiBlockMiner extends GuiContainer{
             drawTexturedModalRect(26, 36 - p, 26, 148-p, 14, p);
         }
 
-        drawCenteredString(fontRenderer,tileEntity.progress*100/Config.bedrock_hitpoints + "%", 105,25,new Color(255,255,255).getRGB());
-        drawCenteredString(fontRenderer,tileEntity.fuelAmount + " Fuel", width/2,height/2-70,new Color(255,255,255).getRGB());
+        drawCenteredString(fontRenderer,tileEntity.progress*100/ SimplyBedrock.Config.bedrock_hitpoints + "%", 105,25,new Color(255,255,255).getRGB());
 
         String s = this.tileEntity.getDisplayName().getUnformattedText();
         this.fontRenderer.drawString(s, this.xSize / 2 - this.fontRenderer.getStringWidth(s) / 2, 6, 4210752);
         this.fontRenderer.drawString(this.inventory.getDisplayName().getUnformattedText(), 8, this.ySize - 93, 4210752);
 
+        GlStateManager.scale(0.8f,0.8f,0.8f);
+        this.fontRenderer.drawString("Fuel", 10, 17, 4210752);
+        GlStateManager.scale(1.25f,1.25f,1.25f);
 
         this.renderHoveredToolTip(mouseX-guiLeft,mouseY-guiTop);
     }
