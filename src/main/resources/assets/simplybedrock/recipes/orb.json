@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"BNB",
+		"NBN",
+		"BNB"
+	],
+	"key": {
+		"N": {
+			"item": "minecraft:nether_star"
+		},
+		"B": {
+			"item": "minecraft:bedrock"
+		}
+	},
+	"result": {
+		"item": "simplybedrock:orb_of_infinity",
+		"data": 0
+	}
+}
