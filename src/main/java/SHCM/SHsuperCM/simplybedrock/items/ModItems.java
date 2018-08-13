@@ -1,5 +1,6 @@
 package SHCM.SHsuperCM.simplybedrock.items;
 
+import SHCM.SHsuperCM.simplybedrock.SimplyBedrock;
 import SHCM.SHsuperCM.simplybedrock.blocks.ModBlocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -16,9 +17,9 @@ import java.lang.reflect.Field;
 public class ModItems {
 
     public static Item bedrock_dust = new Item().setCreativeTab(CreativeTabs.MISC);
+    public static Item orb_of_infinity = new Item().setCreativeTab(CreativeTabs.MISC);
 
     public static ItemBlock bedrock_miner = new ItemBlock(ModBlocks.bedrock_miner);
-
 
     @SubscribeEvent
     public static void register(RegistryEvent.Register<Item> event) {
