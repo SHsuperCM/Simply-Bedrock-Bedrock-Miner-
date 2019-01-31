@@ -13,6 +13,8 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.lang.reflect.Field;
 
@@ -45,6 +47,7 @@ public class ModBlocks {
         }
     }
 
+    @SideOnly(Side.CLIENT)
     public static void registerRenders() {
         for (Field f : ModBlocks.class.getFields()) {
             if(Block.class.isAssignableFrom(f.getType()))
