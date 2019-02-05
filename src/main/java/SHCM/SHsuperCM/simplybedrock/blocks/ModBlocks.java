@@ -21,43 +21,20 @@ import java.lang.reflect.Field;
 @Mod.EventBusSubscriber
 public class ModBlocks {
 
-    public static BlockMiner bedrock_miner;
-
-
-
+    public static BlockMiner bedrock_miner = new BlockMiner();
 
     @SubscribeEvent
     public static void register(RegistryEvent.Register<Block> event) {
-        for (Field f : ModBlocks.class.getFields()) {
-            if(Block.class.isAssignableFrom(f.getType()))
-                try {
-                    Block block = (Block)f.get(null);
-                    if(block == null)
-                        block = (Block)f.getType().newInstance();
+        bedrock_miner.setRegistryName("bedrock_miner").setUnlocalizedName(bedrock_miner.getRegistryName().toString());
 
-                    block.setRegistryName(f.getName());
-                    block.setUnlocalizedName(block.getRegistryName().toString());
+        GameRegistry.registerTileEntity(TEBlockMiner.class,new ResourceLocation(bedrock_miner.getRegistryName() + "_tileentity"));
 
-                    if(block.hasTileEntity(null))
-                        GameRegistry.registerTileEntity(block.createTileEntity(null,null).getClass(),new ResourceLocation(block.getRegistryName().toString() + "_tileentity"));
-
-                    f.set(null, block);
-                    event.getRegistry().register(block);
-                } catch(Exception e) {e.printStackTrace();}
-        }
+        event.getRegistry().register(bedrock_miner);
     }
 
     @SideOnly(Side.CLIENT)
     public static void registerRenders() {
-        for (Field f : ModBlocks.class.getFields()) {
-            if(Block.class.isAssignableFrom(f.getType()))
-                try {
-                    Block block = (Block)f.get(null);
-
-                    Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(block),0,new ModelResourceLocation(block.getRegistryName(),"normal"));
-
-                } catch(Exception e) {e.printStackTrace();}
-        }
+        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(bedrock_miner),0,new ModelResourceLocation(bedrock_miner.getRegistryName(),"normal"));
 
         ClientRegistry.bindTileEntitySpecialRenderer(TEBlockMiner.class,new TESRBlockMiner());
     }

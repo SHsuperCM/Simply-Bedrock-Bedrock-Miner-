@@ -6,6 +6,7 @@ import SHCM.SHsuperCM.simplybedrock.blocks.bedrock_miner.TESRBlockMiner;
 import SHCM.SHsuperCM.simplybedrock.items.ModItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.tileentity.TileEntity;
@@ -39,7 +40,7 @@ public class ClientProxy extends CommonProxy {
     @SubscribeEvent
     public void tick(TickEvent.ClientTickEvent event) {
         World world = Minecraft.getMinecraft().world;
-        if(world != null && world.getTotalWorldTime() % 5 == 0)
+        if(world != null && !(Minecraft.getMinecraft().currentScreen instanceof GuiIngameMenu) && world.getTotalWorldTime() % 5 == 0)
             for(TileEntity te : world.loadedTileEntityList)
                 if(te instanceof TEBlockMiner && ((TEBlockMiner)te).fuelAmount > 0 && world.getBlockState(te.getPos().down()).getBlock() == Blocks.BEDROCK)
                     Minecraft.getMinecraft().getSoundHandler().playSound(new PositionedSoundRecord(SoundEvents.BLOCK_STONE_BREAK, SoundCategory.BLOCKS,1f, -0.5f,te.getPos()));

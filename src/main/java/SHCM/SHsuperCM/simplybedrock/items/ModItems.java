@@ -23,30 +23,20 @@ public class ModItems {
 
     @SubscribeEvent
     public static void register(RegistryEvent.Register<Item> event) {
-        for (Field f : ModItems.class.getFields()) {
-            if(Item.class.isAssignableFrom(f.getType()))
-                try {
-                    Item item = (Item)f.get(null);
-                    if(item == null)
-                        item = (Item)f.getType().newInstance();
+        bedrock_dust.setRegistryName("bedrock_dust").setUnlocalizedName(bedrock_dust.getRegistryName().toString());
+        event.getRegistry().register(bedrock_dust);
 
-                    item.setRegistryName(f.getName());
-                    item.setUnlocalizedName(item.getRegistryName().toString());
+        orb_of_infinity.setRegistryName("orb_of_infinity").setUnlocalizedName(orb_of_infinity.getRegistryName().toString());
+        event.getRegistry().register(orb_of_infinity);
 
-                    f.set(null, item);
-                    event.getRegistry().register(item);
-                } catch(Exception e) {e.printStackTrace();}
-        }
+        bedrock_miner.setRegistryName("bedrock_miner").setUnlocalizedName(bedrock_miner.getRegistryName().toString());
+        event.getRegistry().register(bedrock_miner);
+
     }
 
     public static void registerRenders() {
-        for (Field f : ModItems.class.getFields()) {
-            if(Item.class.isAssignableFrom(f.getType()))
-                try {
-                    Item item = (Item)f.get(null);
-
-                    Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(item,0,new ModelResourceLocation(item.getRegistryName(),"inventory"));
-                } catch(Exception e) {e.printStackTrace();}
-        }
+        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(bedrock_dust,0,new ModelResourceLocation(bedrock_dust.getRegistryName(),"inventory"));
+        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(orb_of_infinity,0,new ModelResourceLocation(orb_of_infinity.getRegistryName(),"inventory"));
+        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(bedrock_miner,0,new ModelResourceLocation(bedrock_miner.getRegistryName(),"inventory"));
     }
 }
