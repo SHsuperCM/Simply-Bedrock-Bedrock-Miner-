@@ -14,8 +14,12 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
 public class TESRBlockMiner extends TileEntitySpecialRenderer<TEBlockMiner> {
-    private static final EntityItem PICKAXE = new EntityItem(Minecraft.getMinecraft().world, 0, 0, 0, new ItemStack(Items.DIAMOND_PICKAXE));
+    private static EntityItem PICKAXE = new EntityItem(Minecraft.getMinecraft().world, 0, 0, 0, ItemStack.EMPTY);
     private static final TextureAtlasSprite[] destroyBlockIcons = new TextureAtlasSprite[10];
+
+    public static void setPickaxeModelItem(ItemStack stack) {
+        PICKAXE.setItem(stack);
+    }
 
     public static void registerBlockBreaking(Minecraft mc) {
         TextureMap texturemap = mc.getTextureMapBlocks();

@@ -9,6 +9,8 @@ import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -44,5 +46,10 @@ public class ClientProxy extends CommonProxy {
             for(TileEntity te : world.loadedTileEntityList)
                 if(te instanceof TEBlockMiner && ((TEBlockMiner)te).fuelAmount > 0 && world.getBlockState(te.getPos().down()).getBlock() == Blocks.BEDROCK)
                     Minecraft.getMinecraft().getSoundHandler().playSound(new PositionedSoundRecord(SoundEvents.BLOCK_STONE_BREAK, SoundCategory.BLOCKS,1f, -0.5f,te.getPos()));
+    }
+
+    @Override
+    public void setModelPickaxe(NBTTagCompound itemNBT) {
+        TESRBlockMiner.setPickaxeModelItem(new ItemStack(itemNBT));
     }
 }

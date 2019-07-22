@@ -6,6 +6,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTException;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.ConfigManager;
@@ -36,10 +38,21 @@ public class SimplyBedrock {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         proxy.init(event);
+        syncConfig(new ConfigChangedEvent(MODID, null, false, false));
     }
 
     @SubscribeEvent
-    public void syncConfig(ConfigChangedEvent event) { ConfigManager.sync(MODID, net.minecraftforge.common.config.Config.Type.INSTANCE); }
+    public void syncConfig(ConfigChangedEvent event) {
+        if(!event.getModID().equals(MODID)) return;
+
+        ConfigManager.sync(MODID, net.minecraftforge.common.config.Config.Type.INSTANCE);
+        try {
+            proxy.setModelPickaxe(JsonToNBT.getTagFromJson(Config.block_model_pickaxe));
+        } catch (NBTException e) {
+            proxy.setModelPickaxe(ItemStack.EMPTY.serializeNBT());
+            e.printStackTrace();
+        }
+    }
     @net.minecraftforge.common.config.Config(modid = MODID)
     public static class Config {
 
@@ -54,5 +67,9 @@ public class SimplyBedrock {
         @net.minecraftforge.common.config.Config.Name("Orb of Infinity XP cost")
         @net.minecraftforge.common.config.Config.Comment({"How many levels should applying an Orb of Infinity on a tool cost"})
         public static int orb_of_infinity_xp_cost = 100;
+
+        @net.minecraftforge.common.config.Config.Name("Block model pickaxe")
+        @net.minecraftforge.common.config.Config.Comment("NBT formatted itemstack that'll be rendered mining the bedrock")
+        public static String block_model_pickaxe = new ItemStack(Items.DIAMOND_PICKAXE).serializeNBT().toString();
     }
 }
