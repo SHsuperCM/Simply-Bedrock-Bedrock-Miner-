@@ -43,7 +43,7 @@ public class GuiBlockMiner extends GuiContainer{
         mc.getTextureManager().bindTexture(TEXTURE);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-        if(SimplyBedrock.Config.bedrock_hitpoints != 0 && tileEntity.getWorld().getBlockState(tileEntity.getPos().down()).getBlock() == Blocks.BEDROCK) {
+        if(SimplyBedrock.Config.bedrock_hitpoints != 0 && tileEntity.isAboveBedrock()) {
             int p = tileEntity.progress * 128 / SimplyBedrock.Config.bedrock_hitpoints;
             drawTexturedModalRect(41 + p, 21, 41, 133, 128 - p, 16);
         }

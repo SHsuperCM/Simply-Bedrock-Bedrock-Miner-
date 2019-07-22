@@ -31,7 +31,7 @@ public class TESRBlockMiner extends TileEntitySpecialRenderer<TEBlockMiner> {
     @Override
     public void render(TEBlockMiner te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         float angle = ((int) te.getWorld().getTotalWorldTime() + partialTicks) * 25;
-        boolean mining = te.fuelAmount > 0 && getWorld().getBlockState(te.getPos().down()).getBlock() == Blocks.BEDROCK;
+        boolean mining = te.fuelAmount > 0 && te.isAboveBedrock();
 
         PICKAXE.hoverStart = 0;
         GlStateManager.pushMatrix();

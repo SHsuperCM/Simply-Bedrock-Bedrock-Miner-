@@ -1,7 +1,9 @@
 package SHCM.SHsuperCM.simplybedrock;
 
+import SHCM.SHsuperCM.simplybedrock.blocks.bedrock_miner.TEBlockMiner;
 import SHCM.SHsuperCM.simplybedrock.items.ModItems;
 import SHCM.SHsuperCM.simplybedrock.proxy.CommonProxy;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -18,6 +20,10 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Mod(modid = SimplyBedrock.MODID, acceptedMinecraftVersions = "[1.12]")
 public class SimplyBedrock {
@@ -52,6 +58,8 @@ public class SimplyBedrock {
             proxy.setModelPickaxe(ItemStack.EMPTY.serializeNBT());
             e.printStackTrace();
         }
+
+        TEBlockMiner.setBedrockBlocks(Arrays.stream(Config.bedrock_blocks).map(Block::getBlockFromName).collect(Collectors.toList()));
     }
     @net.minecraftforge.common.config.Config(modid = MODID)
     public static class Config {
@@ -67,6 +75,10 @@ public class SimplyBedrock {
         @net.minecraftforge.common.config.Config.Name("Orb of Infinity XP cost")
         @net.minecraftforge.common.config.Config.Comment({"How many levels should applying an Orb of Infinity on a tool cost"})
         public static int orb_of_infinity_xp_cost = 100;
+
+        @net.minecraftforge.common.config.Config.Name("Bedrock blocks")
+        @net.minecraftforge.common.config.Config.Comment({"A list of blocks that the miner considers as bedrock.", "The format is \"modid:blockid\"."})
+        public static String[] bedrock_blocks = new String[] {"minecraft:bedrock"};
 
         @net.minecraftforge.common.config.Config.Name("Block model pickaxe")
         @net.minecraftforge.common.config.Config.Comment("NBT formatted itemstack that'll be rendered mining the bedrock")

@@ -3,6 +3,7 @@ package SHCM.SHsuperCM.simplybedrock.blocks.bedrock_miner;
 import SHCM.SHsuperCM.simplybedrock.SimplyBedrock;
 import SHCM.SHsuperCM.simplybedrock.blocks.ModBlocks;
 import SHCM.SHsuperCM.simplybedrock.items.ModItems;
+import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -23,9 +24,17 @@ import net.minecraft.util.SoundCategory;
 
 import javax.annotation.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static net.minecraft.block.BlockObserver.POWERED;
 
 public class TEBlockMiner extends TileEntityLockable implements ITickable, IInventory {
+    private static List<Block> bedrockBlocks = new ArrayList<>();
+
+    public static void setBedrockBlocks(List<Block> bedrockBlocks) {
+        TEBlockMiner.bedrockBlocks = bedrockBlocks;
+    }
 
     public ItemStack fuelItem = ItemStack.EMPTY;
     public int fuelAmount = 0;
@@ -78,6 +87,10 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
         return compound;
     }
 
+    public boolean isAboveBedrock() {
+        return bedrockBlocks.contains(world.getBlockState(getPos().down()).getBlock());
+    }
+
     @Override
     public void update() {
         if(!world.isRemote) {
@@ -88,7 +101,7 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
                 world.spawnEntity(new EntityItem(world,getPos().getX() + 0.5d, pos.getY() + 0.7d, pos.getZ() + 0.5d,new ItemStack(ModItems.bedrock_dust)));
 
                 world.notifyNeighborsOfStateChange(pos, ModBlocks.bedrock_miner, true);
-            } else if (world.getBlockState(getPos().down()).getBlock() == Blocks.BEDROCK) {
+            } else if (isAboveBedrock()) {
                 if (fuelAmount > 0) {
                     progress++;
                     fuelAmount--;

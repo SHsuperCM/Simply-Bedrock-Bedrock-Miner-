@@ -44,7 +44,7 @@ public class ClientProxy extends CommonProxy {
         World world = Minecraft.getMinecraft().world;
         if(world != null && !(Minecraft.getMinecraft().currentScreen instanceof GuiIngameMenu) && world.getTotalWorldTime() % 5 == 0)
             for(TileEntity te : world.loadedTileEntityList)
-                if(te instanceof TEBlockMiner && ((TEBlockMiner)te).fuelAmount > 0 && world.getBlockState(te.getPos().down()).getBlock() == Blocks.BEDROCK)
+                if(te instanceof TEBlockMiner && ((TEBlockMiner)te).fuelAmount > 0 && ((TEBlockMiner) te).isAboveBedrock())
                     Minecraft.getMinecraft().getSoundHandler().playSound(new PositionedSoundRecord(SoundEvents.BLOCK_STONE_BREAK, SoundCategory.BLOCKS,1f, -0.5f,te.getPos()));
     }
 
