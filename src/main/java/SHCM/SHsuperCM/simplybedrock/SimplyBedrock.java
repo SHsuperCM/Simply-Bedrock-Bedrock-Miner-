@@ -23,6 +23,8 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Mod(modid = SimplyBedrock.MODID, acceptedMinecraftVersions = "[1.12]")
@@ -60,6 +62,19 @@ public class SimplyBedrock {
         }
 
         TEBlockMiner.setBedrockBlocks(Arrays.stream(Config.bedrock_blocks).map(Block::getBlockFromName).collect(Collectors.toList()));
+
+        Map<Block, ItemStack> drops = new HashMap<>();
+        for (String drop : Config.block_drops) {
+            String[] blockDrop = drop.split(">");
+            ItemStack stack;
+            try {
+                stack = new ItemStack(JsonToNBT.getTagFromJson(blockDrop[1]));
+            } catch (NBTException e) {
+                stack = ItemStack.EMPTY;
+            }
+            drops.put(Block.getBlockFromName(blockDrop[0]), stack);
+        }
+        TEBlockMiner.setDrops(drops);
     }
     @net.minecraftforge.common.config.Config(modid = MODID)
     public static class Config {
@@ -79,6 +94,10 @@ public class SimplyBedrock {
         @net.minecraftforge.common.config.Config.Name("Bedrock blocks")
         @net.minecraftforge.common.config.Config.Comment({"A list of blocks that the miner considers as bedrock.", "The format is \"modid:blockid\"."})
         public static String[] bedrock_blocks = new String[] {"minecraft:bedrock"};
+
+        @net.minecraftforge.common.config.Config.Name("Block Drops")
+        @net.minecraftforge.common.config.Config.Comment({"A list of blocks and itemstacks that say what drops when a block is mined,", "The format is:", "modid:blockid>{item_nbt}"})
+        public static String[] block_drops = new String[]{"minecraft:bedrock>{id:\"simplybedrock:bedrock_dust\",Count:1b}"};
 
         @net.minecraftforge.common.config.Config.Name("Block model pickaxe")
         @net.minecraftforge.common.config.Config.Comment("NBT formatted itemstack that'll be rendered mining the bedrock")

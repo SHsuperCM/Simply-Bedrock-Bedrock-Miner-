@@ -25,15 +25,22 @@ import net.minecraft.util.SoundCategory;
 import javax.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static net.minecraft.block.BlockObserver.POWERED;
 
 public class TEBlockMiner extends TileEntityLockable implements ITickable, IInventory {
     private static List<Block> bedrockBlocks = new ArrayList<>();
+    private static Map<Block, ItemStack> drops = new HashMap<>();
 
     public static void setBedrockBlocks(List<Block> bedrockBlocks) {
         TEBlockMiner.bedrockBlocks = bedrockBlocks;
+    }
+
+    public static void setDrops(Map<Block, ItemStack> drops) {
+        TEBlockMiner.drops = drops;
     }
 
     public ItemStack fuelItem = ItemStack.EMPTY;
@@ -95,10 +102,11 @@ public class TEBlockMiner extends TileEntityLockable implements ITickable, IInve
     public void update() {
         if(!world.isRemote) {
             if(progress >= SimplyBedrock.Config.bedrock_hitpoints) {
-                world.destroyBlock(pos.down(),false);
                 progress = 0;
                 world.getPlayers(EntityPlayerMP.class,input -> input.getDistance(pos.getX(),pos.getY(),pos.getZ()) < 10).forEach(player -> player.connection.sendPacket(new SPacketCustomSound("minecraft:block.stone.break", SoundCategory.BLOCKS,pos.getX(),pos.getY(),pos.getZ(),1f,0.5f)));
-                world.spawnEntity(new EntityItem(world,getPos().getX() + 0.5d, pos.getY() + 0.7d, pos.getZ() + 0.5d,new ItemStack(ModItems.bedrock_dust)));
+                ItemStack drop = drops.get(getWorld().getBlockState(pos.down()).getBlock());
+                world.spawnEntity(new EntityItem(world,getPos().getX() + 0.5d, pos.getY() + 0.7d, pos.getZ() + 0.5d, drop == null ? ItemStack.EMPTY : drop));
+                world.destroyBlock(pos.down(),false);
 
                 world.notifyNeighborsOfStateChange(pos, ModBlocks.bedrock_miner, true);
             } else if (isAboveBedrock()) {
